@@ -1,0 +1,3 @@
+# gee v0.0.0 => ./gee
+## explicit; go 1.19
+# gee => ./gee
