@@ -1,7 +1,4 @@
-module example
+module github.com/jeevic/7days-golang/gee-web
 
 go 1.19
 
-require gee v0.0.0
-
-replace gee => ./gee
