@@ -11,6 +11,8 @@ type H map[string]interface{}
 type Context struct {
 	Writer http.ResponseWriter
 	Req    *http.Request
+	//engine
+	engine *Engine
 
 	//request info
 	Path   string
@@ -78,10 +80,12 @@ func (c *Context) Data(code int, data []byte) {
 	_, _ = c.Writer.Write(data)
 }
 
-func (c *Context) HTML(code int, html string) {
+func (c *Context) HTML(code int, name string, data any) {
 	c.SetHeader("Content-Type", "text/html")
 	c.Status(code)
-	_, _ = c.Writer.Write([]byte(html))
+	if err := c.engine.htmlTemplates.ExecuteTemplate(c.Writer, name, data); err != nil {
+		c.Fail(500, err.Error())
+	}
 }
 
 func (c *Context) Fail(code int, err string) {
