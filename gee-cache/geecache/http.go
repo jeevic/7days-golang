@@ -11,8 +11,8 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	"geecache/consistenthash"
-	pb "geecache/geecachepb"
+	"github.com/jeevic/7days-golang/gee-cache/geecache/consistenthash"
+	pb "github.com/jeevic/7days-golang/gee-cache/geecache/geecachepb"
 )
 
 const (

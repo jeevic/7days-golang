@@ -1,6 +1,6 @@
 package geecache
 
-import pb "geecache/geecachepb"
+import pb "github.com/jeevic/7days-golang/gee-cache/geecache/geecachepb"
 
 // PeerPicker is the interface that must be implemented to locate
 // the peer that owns a specific key.

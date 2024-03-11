@@ -3,9 +3,7 @@ package geecache
 import (
 	"sync"
 
-	"geecache/lru"
-
-	"github.com/jeevic/7days-golang/gee-cache/geecache"
+	"github.com/jeevic/7days-golang/gee-cache/geecache/lru"
 )
 
 type cache struct {
@@ -14,7 +12,7 @@ type cache struct {
 	cacheBytes int64
 }
 
-func (c *cache) add(key string, value geecache.ByteView) {
+func (c *cache) add(key string, value ByteView) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.lru == nil {
@@ -23,14 +21,14 @@ func (c *cache) add(key string, value geecache.ByteView) {
 	c.lru.Add(key, value)
 }
 
-func (c *cache) get(key string) (value geecache.ByteView, ok bool) {
+func (c *cache) get(key string) (value ByteView, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.lru == nil {
 		return
 	}
 	if v, ok := c.lru.Get(key); ok {
-		return v.(geecache.ByteView), ok
+		return v.(ByteView), ok
 	}
 	return
 }

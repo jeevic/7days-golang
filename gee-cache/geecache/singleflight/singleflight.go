@@ -13,7 +13,7 @@ type Group struct {
 	m  map[string]*call
 }
 
-// 进行函数执行
+// Do 进行函数执行
 func (g *Group) Do(key string, fn func() (interface{}, error)) (interface{}, error) {
 	g.mu.Lock()
 	if g.m == nil {

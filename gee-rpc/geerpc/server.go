@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	"geerpc/codec"
+	"github.com/jeevic/7days-golang/gee-rpc/geerpc/codec"
 )
 
 const MagicNumber = 0x3bef5c
@@ -95,8 +95,8 @@ func (server *Server) serveCodec(cc codec.Codec, opt *Option) {
 type request struct {
 	h            *codec.Header // header of request
 	argv, replyv reflect.Value // argv and replyv of request
-	mtype        *gee_rpc.methodType
-	svc          *gee_rpc.service
+	mtype        *methodType
+	svc          *service
 }
 
 func (server *Server) readRequestHeader(cc codec.Codec) (*codec.Header, error) {
@@ -110,7 +110,7 @@ func (server *Server) readRequestHeader(cc codec.Codec) (*codec.Header, error) {
 	return &h, nil
 }
 
-func (server *Server) findService(serviceMethod string) (svc *gee_rpc.service, mtype *gee_rpc.methodType, err error) {
+func (server *Server) findService(serviceMethod string) (svc *service, mtype *methodType, err error) {
 	dot := strings.LastIndex(serviceMethod, ".")
 	if dot < 0 {
 		err = errors.New("rpc server: service/method request ill-formed: " + serviceMethod)
@@ -122,7 +122,7 @@ func (server *Server) findService(serviceMethod string) (svc *gee_rpc.service, m
 		err = errors.New("rpc server: can't find service " + serviceName)
 		return
 	}
-	svc = svci.(*gee_rpc.service)
+	svc = svci.(*service)
 	mtype = svc.method[methodName]
 	if mtype == nil {
 		err = errors.New("rpc server: can't find method " + methodName)
@@ -222,7 +222,7 @@ func Accept(lis net.Listener) { DefaultServer.Accept(lis) }
 //   - the second argument is a pointer
 //   - one return value, of type error
 func (server *Server) Register(rcvr interface{}) error {
-	s := gee_rpc.newService(rcvr)
+	s := newService(rcvr)
 	if _, dup := server.serviceMap.LoadOrStore(s.name, s); dup {
 		return errors.New("rpc: service already defined: " + s.name)
 	}

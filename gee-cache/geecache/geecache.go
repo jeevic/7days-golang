@@ -5,10 +5,8 @@ import (
 	"log"
 	"sync"
 
-	pb "geecache/geecachepb"
-	"geecache/singleflight"
-
-	"github.com/jeevic/7days-golang/gee-cache/geecache"
+	pb "github.com/jeevic/7days-golang/gee-cache/geecache/geecachepb"
+	"github.com/jeevic/7days-golang/gee-cache/geecache/singleflight"
 )
 
 // A Getter loads data for a key.
@@ -75,9 +73,9 @@ func GetGroup(name string) *Group {
 }
 
 // Get value for a key from cache
-func (g *Group) Get(key string) (geecache.ByteView, error) {
+func (g *Group) Get(key string) (ByteView, error) {
 	if key == "" {
-		return geecache.ByteView{}, fmt.Errorf("key is required")
+		return ByteView{}, fmt.Errorf("key is required")
 	}
 
 	if v, ok := g.mainCache.get(key); ok {
@@ -88,7 +86,7 @@ func (g *Group) Get(key string) (geecache.ByteView, error) {
 	return g.load(key)
 }
 
-func (g *Group) load(key string) (value geecache.ByteView, err error) {
+func (g *Group) load(key string) (value ByteView, err error) {
 	viewi, err := g.loader.Do(key, func() (interface{}, error) {
 		if g.peers != nil {
 			if peer, ok := g.peers.PickPeer(key); ok {
@@ -103,12 +101,12 @@ func (g *Group) load(key string) (value geecache.ByteView, err error) {
 	})
 
 	if err == nil {
-		return viewi.(geecache.ByteView), nil
+		return viewi.(ByteView), nil
 	}
 	return
 }
 
-func (g *Group) getFromPeer(peer PeerGetter, key string) (geecache.ByteView, error) {
+func (g *Group) getFromPeer(peer PeerGetter, key string) (ByteView, error) {
 	req := &pb.Request{
 		Group: g.name,
 		Key:   key,
@@ -117,22 +115,22 @@ func (g *Group) getFromPeer(peer PeerGetter, key string) (geecache.ByteView, err
 	res := &pb.Response{}
 	err := peer.Get(req, res)
 	if err != nil {
-		return geecache.ByteView{}, err
+		return ByteView{}, err
 	}
-	return geecache.ByteView{b: res.GetValue()}, nil
+	return ByteView{b: res.GetValue()}, nil
 }
 
-func (g *Group) getLocally(key string) (geecache.ByteView, error) {
+func (g *Group) getLocally(key string) (ByteView, error) {
 	bytes, err := g.getter.Get(key)
 	if err != nil {
-		return geecache.ByteView{}, err
+		return ByteView{}, err
 
 	}
-	value := geecache.ByteView{b: geecache.cloneBytes(bytes)}
+	value := ByteView{b: cloneBytes(bytes)}
 	g.populateCache(key, value)
 	return value, nil
 }
 
-func (g *Group) populateCache(key string, value geecache.ByteView) {
+func (g *Group) populateCache(key string, value ByteView) {
 	g.mainCache.add(key, value)
 }
